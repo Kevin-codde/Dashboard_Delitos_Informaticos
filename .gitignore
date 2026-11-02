@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Variables de entorno y secretos
+.env
+*.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+.sonarlint/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Datos locales y bases de datos locales
+delitos_db.json
+*.sqlite3
+*.db
+
+# Modelos entrenados y archivos temporales
+*.pkl
+*.joblib
+*.log
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Power BI (archivos temporales)
+*.pbix.tmp
+.pbi/
