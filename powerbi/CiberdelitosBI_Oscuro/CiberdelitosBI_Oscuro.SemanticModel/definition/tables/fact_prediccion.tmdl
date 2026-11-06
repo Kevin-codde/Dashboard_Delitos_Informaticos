@@ -1,0 +1,106 @@
+table fact_prediccion
+	lineageTag: d8f3be55-ae35-5966-80c8-70d490469983
+
+	measure 'Casos Estimados' = VAR _a = IF(ISFILTERED(dim_departamento[departamento]), "Departamento", "Nacional") RETURN CALCULATE(SUM(fact_prediccion[casos_estimados]), fact_prediccion[ambito] = _a)
+		formatString: #,0
+		displayFolder: Predicción
+		lineageTag: 62a9431e-4183-5553-896f-49f4476c2717
+
+	measure 'Casos Último Año (parcial)' = VAR _a = IF(ISFILTERED(dim_departamento[departamento]), "Departamento", "Nacional") RETURN CALCULATE(SUM(fact_prediccion[casos_ultimo_anio]), fact_prediccion[ambito] = _a)
+		formatString: #,0
+		displayFolder: Predicción
+		lineageTag: c75e6aac-0944-561b-ba7c-470332fff31e
+
+	measure 'Año Proyectado' = MAX(fact_prediccion[anio_proyectado])
+		formatString: 0
+		displayFolder: Predicción
+		lineageTag: 91e61902-a3a1-533d-8596-62f31559c7be
+
+	measure 'Error Medio (MAE)' = VAR _a = IF(ISFILTERED(dim_departamento[departamento]), "Departamento", "Nacional") RETURN CALCULATE(AVERAGE(fact_prediccion[mae_modelo]), fact_prediccion[ambito] = _a)
+		formatString: #,0.0
+		displayFolder: Predicción
+		lineageTag: fedf43d4-6500-5ee7-ac50-8b524cce1d56
+
+	measure 'Tipología de Mayor Riesgo' = VAR _t = TOPN(1, VALUES(dim_tipologia[tipologia]), [Casos Estimados], DESC) RETURN CONCATENATEX(_t, dim_tipologia[tipologia], ", ")
+		displayFolder: Predicción
+		lineageTag: 431166a0-b2e2-5e83-b93e-2133c7cd184a
+
+	column ambito
+		dataType: string
+		isHidden
+		lineageTag: cda0dbb6-a64f-5793-875a-384706f0d74f
+		summarizeBy: none
+		sourceColumn: ambito
+
+		annotation SummarizationSetBy = Automatic
+
+	column departamento
+		dataType: string
+		isHidden
+		lineageTag: 859e3109-538a-5fc6-af50-85c431d0d6f4
+		summarizeBy: none
+		sourceColumn: departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_tipologia
+		dataType: string
+		isHidden
+		lineageTag: dd621c05-d528-5f8f-addc-391925c8a8af
+		summarizeBy: none
+		sourceColumn: codigo_tipologia
+
+		annotation SummarizationSetBy = Automatic
+
+	column casos_ultimo_anio
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: 654bdf9a-e41d-55aa-864c-d8fd7e6c8865
+		summarizeBy: none
+		sourceColumn: casos_ultimo_anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column casos_estimados
+		dataType: int64
+		isHidden
+		formatString: #,0
+		lineageTag: c9bcd505-6abb-5462-b21b-10ca62dcc993
+		summarizeBy: none
+		sourceColumn: casos_estimados
+
+		annotation SummarizationSetBy = Automatic
+
+	column anio_proyectado
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ed7fbd54-eff2-527d-9603-9c2da72900d6
+		summarizeBy: none
+		sourceColumn: anio_proyectado
+
+		annotation SummarizationSetBy = Automatic
+
+	column mae_modelo
+		dataType: double
+		isHidden
+		formatString: #,0.0
+		lineageTag: 53dc6646-9bec-5389-94a8-6ed27c41b605
+		summarizeBy: none
+		sourceColumn: mae_modelo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_prediccion = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "fact_prediccion", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"ambito", type text}, {"departamento", type text}, {"codigo_tipologia", type text}, {"casos_ultimo_anio", Int64.Type}, {"casos_estimados", Int64.Type}, {"anio_proyectado", Int64.Type}, {"mae_modelo", type number}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+

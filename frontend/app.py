@@ -1,211 +1,118 @@
 """
-Aplicación Principal Streamlit (app.py)
-Dashboard de Business Intelligence interactivo sobre Delitos Informáticos en Colombia.
+Frontend de Streamlit: muestra el reporte de Power BI dentro de la página.
+
+Streamlit NO dibuja gráficos aquí; solo enmarca el reporte publicado.
+Los enlaces de los reportes están en frontend/config.py. Para usar otros sin tocar el repo:
+
+    Windows (PowerShell):   $env:POWERBI_URL="https://app.powerbi.com/view?r=..."
+    (para el reporte oscuro: POWERBI_URL_OSCURO)
+
+Ejecutar desde la raíz del repositorio:
+    streamlit run frontend/app.py
 """
 
+import html
+import os
+
 import streamlit as st
-import pandas as pd
-import plotly.express as px
 
-from backend.Bd.db import consultar_datos_filtrados, obtener_metadatos_estado
-from ml.modelo import entrenar_y_predecir_siguiente_anio
+from config import REPORTE_CLARO, REPORTE_OSCURO  # enlaces públicos: ver frontend/config.py
 
-# Configuración de página de Streamlit
-st.set_page_config(
-    page_title="BI Dashboard - Ciberdelitos Colombia",
-    page_icon="🛡️",
-    layout="wide"
-)
-
-# Lista ordenada de meses para consistencia en los filtros
-MESES_ORDENADOS = [
-    "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
-    "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-]
+# El reporte mide 1280x720; se suman ~42 px de la barra inferior de Power BI (proporción 1280 / 762).
 
 
-@st.cache_data(ttl=600)
-def cargar_datos_cache(anio_range, meses, departamento, municipio, tipologias):
-    """Carga los datos optimizada con caché de Streamlit."""
-    return consultar_datos_filtrados(
-        anio_range=anio_range,
-        meses=meses,
-        departamento=departamento,
-        municipio=municipio,
-        tipologias=tipologias
+def obtener_url(oscuro: bool = False) -> str:
+    """URL del reporte: variable de entorno, luego secrets.toml, luego frontend/config.py.
+    En modo oscuro usa POWERBI_URL_OSCURO; si no está definida, cae al reporte claro."""
+    clave = "POWERBI_URL_OSCURO" if oscuro else "POWERBI_URL"
+    por_defecto = REPORTE_OSCURO if oscuro else REPORTE_CLARO
+    if clave in os.environ:
+        return os.environ[clave].strip()
+    try:
+        url = str(st.secrets.get(clave, "")).strip()
+        if url:
+            return url
+    except Exception:  # no existe secrets.toml
+        pass
+    return por_defecto
+
+
+def url_valida(url: str) -> bool:
+    return url.startswith("https://app.powerbi.com/")
+
+
+CSS_OSCURO = """
+<style>
+  .stApp, [data-testid="stAppViewContainer"] {background: #0A1222; color: #E8EEF9;}
+  header[data-testid="stHeader"] {background: transparent;}
+  .titulo {color: #E8EEF9 !important;}
+  .sub, .stCaption, [data-testid="stCaptionContainer"] {color: #9FB0CC !important;}
+  .pbi {border: 1px solid #243350 !important;}
+  [data-testid="stBaseLinkButton-secondary"] {background: #121C31 !important; color: #E8EEF9 !important;
+                                              border: 1px solid #243350 !important;}
+  [data-testid="stBaseLinkButton-secondary"] p {color: #E8EEF9 !important;}
+  [data-testid="stBaseButton-secondary"] {background: #121C31; color: #E8EEF9; border-color: #243350;}
+  label, p {color: #E8EEF9;}
+</style>
+"""
+
+
+def main() -> None:
+    st.set_page_config(page_title="Ciberdelitos en Colombia", page_icon="🛡️",
+                       layout="wide", initial_sidebar_state="collapsed")
+
+    st.markdown(
+        """
+        <style>
+          .block-container {padding-top: 1.2rem; padding-bottom: 0.5rem; max-width: 1500px;}
+          .titulo {font-size: 1.7rem; font-weight: 700; color: #0B2545; margin: 0;}
+          .sub {color: #5B6B8C; margin: 0 0 .8rem 0;}
+          header[data-testid="stHeader"] {background: transparent;}
+          .pbi {position: relative; width: 100%; aspect-ratio: 1280 / 762; overflow: hidden;
+                border: 1px solid #DDE3EE; border-radius: 10px;}
+          .pbi iframe {position: absolute; inset: 0; width: 100%; height: 100%; border: 0;}
+        </style>
+        """,
+        unsafe_allow_html=True,
     )
 
+    st.markdown('<p class="titulo">🛡️ Delitos informáticos en Colombia</p>'
+                '<p class="sub">Ley 1273 de 2009 · datos abiertos 2006–2026 · '
+                'reporte interactivo en Power BI</p>', unsafe_allow_html=True)
 
-# -----------------------------------------------------------------------------
-# ENCABEZADO Y TITULO
-# -----------------------------------------------------------------------------
-st.title("🛡️ Dashboard BI: Delitos Informáticos en Colombia")
-st.markdown("Prototipo de Inteligencia de Negocios basado en microdatos de **datos.gov.co** (MinDefensa / Policía Nacional).")
+    _, col_modo = st.columns([6, 1])
+    oscuro = col_modo.toggle("🌙 Modo oscuro", key="oscuro")
+    if oscuro:
+        st.markdown(CSS_OSCURO, unsafe_allow_html=True)
 
-# -----------------------------------------------------------------------------
-# HU1: ESTADO DE LOS DATOS (Carga y Metadatos)
-# -----------------------------------------------------------------------------
-with st.expander("📌 Estado de los Datos (Metadatos NoSQL)", expanded=False):
-    total_db, rango_f, total_deptos, total_tipos = obtener_metadatos_estado()
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total Registros Cargados", f"{total_db:,}")
-    c2.metric("Rango Histórico de Años", rango_f)
-    c3.metric("Departamentos Cubiertos", total_deptos)
-    c4.metric("Tipologías Penales", total_tipos)
+    url = obtener_url(oscuro)
+    if oscuro and not url:  # aún no hay versión oscura publicada: se muestra la clara
+        url = obtener_url(False)
+        st.caption("La versión oscura del reporte aún no está publicada; se muestra la clara.")
 
-# -----------------------------------------------------------------------------
-# HU2: FILTROS LATERALES DINÁMICOS
-# -----------------------------------------------------------------------------
-st.sidebar.header("🔍 Filtros de Análisis")
+    if not url:
+        st.info("Aún no hay un reporte configurado. Publica el reporte en Power BI "
+                "(Archivo → Insertar informe → Publicar en la web) y define la variable "
+                "`POWERBI_URL` con el enlace.")
+        with st.expander("¿Cómo lo configuro?", expanded=True):
+            st.code('$env:POWERBI_URL="https://app.powerbi.com/view?r=TU_ENLACE"\n'
+                    "streamlit run frontend/app.py", language="powershell")
+        return
 
-# Carga inicial sin filtros para extraer listas maestras
-df_base = consultar_datos_filtrados()
+    if not url_valida(url):
+        st.error("La URL configurada no parece de Power BI (debe empezar por "
+                 "`https://app.powerbi.com/`).")
+        return
 
-if df_base.empty:
-    st.error("❌ No se encontraron datos en la base de datos NoSQL. Ejecute primero 'python etl.py'.")
-    st.stop()
+    st.markdown(
+        f'<div class="pbi"><iframe src="{html.escape(url, quote=True)}" title="Reporte de Power BI" '
+        'allowfullscreen="true" frameborder="0"></iframe></div>',
+        unsafe_allow_html=True)
 
-# 1. Filtro de Rango de Años
-min_anio = int(df_base['anio'].min())
-max_anio = int(df_base['anio'].max())
-anio_range = st.sidebar.slider("Rango de Años:", min_value=min_anio, max_value=max_anio, value=(min_anio, max_anio))
+    col1, col2 = st.columns([1, 4])
+    col1.link_button("Abrir en pantalla completa", url)
+    col2.caption("Usa los filtros del reporte (año, departamento, tipología) para explorar. "
+                 "Los datos corresponden al último corte cargado en MongoDB.")
 
-# 2. Filtro de Meses
-meses_sel = st.sidebar.multiselect("Meses del Año:", options=MESES_ORDENADOS, default=[])
 
-# 3. Filtro de Departamento
-deptos_lista = ["TODOS"] + sorted(list(df_base['departamento'].unique()))
-depto_sel = st.sidebar.selectbox("Departamento:", options=deptos_lista, index=0)
-
-# 4. Filtro Dependiente de Municipio
-if depto_sel != "TODOS":
-    muni_opciones = ["TODOS"] + sorted(list(df_base[df_base['departamento'] == depto_sel]['municipio'].unique()))
-else:
-    muni_opciones = ["TODOS"] + sorted(list(df_base['municipio'].unique()))
-muni_sel = st.sidebar.selectbox("Municipio:", options=muni_opciones, index=0)
-
-# 5. Filtro de Tipología Penal
-tipos_lista = sorted(list(df_base['tipologia'].unique()))
-tipos_sel = st.sidebar.multiselect("Tipología de Delito:", options=tipos_lista, default=[])
-
-# -----------------------------------------------------------------------------
-# CONSULTA CON FILTROS APLICADOS
-# -----------------------------------------------------------------------------
-df_filtrado = cargar_datos_cache(
-    anio_range=anio_range,
-    meses=meses_sel if meses_sel else None,
-    departamento=depto_sel,
-    municipio=muni_sel,
-    tipologias=tipos_sel if tipos_sel else None
-)
-
-# Indicador Destacado de Casos Filtrados
-total_casos_filtrados = int(df_filtrado['cantidad'].sum()) if not df_filtrado.empty else 0
-st.metric(label="📊 Total de Casos Filtrados", value=f"{total_casos_filtrados:,}")
-
-# Manejo de Filtros sin Resultados (HU2)
-if df_filtrado.empty:
-    st.info("⚠️ No hay registros para los filtros seleccionados.")
-    st.stop()
-
-# -----------------------------------------------------------------------------
-# HU3: GRÁFICAS ESTADÍSTICAS
-# -----------------------------------------------------------------------------
-st.markdown("---")
-st.subheader("📈 Comportamiento y Distribución de Ciberdelitos")
-
-col_g1, col_g2 = st.columns(2)
-
-with col_g1:
-    df_evo = df_filtrado.groupby('anio')['cantidad'].sum().reset_index()
-    fig_linea = px.line(
-        df_evo,
-        x='anio',
-        y='cantidad',
-        markers=True,
-        title="Evolución Histórica Anual de Casos",
-        labels={'anio': 'Año', 'cantidad': 'Número de Casos'},
-        hover_data={'cantidad': ':,'}
-    )
-    fig_linea.update_traces(line_color="#1f77b4", line_width=3)
-    st.plotly_chart(fig_linea, use_container_width=True)
-
-with col_g2:
-    df_tipo = df_filtrado.groupby('tipologia')['cantidad'].sum().reset_index().sort_values(by='cantidad', ascending=True)
-    fig_barras_tipo = px.bar(
-        df_tipo,
-        x='cantidad',
-        y='tipologia',
-        orientation='h',
-        title="Distribución de Casos por Tipología Penal",
-        labels={'cantidad': 'Número de Casos', 'tipologia': 'Tipología'},
-        hover_data={'cantidad': ':,'}
-    )
-    fig_barras_tipo.update_traces(marker_color="#ff7f0e")
-    st.plotly_chart(fig_barras_tipo, use_container_width=True)
-
-# -----------------------------------------------------------------------------
-# HU4: COMPARACIÓN POR DEPARTAMENTO
-# -----------------------------------------------------------------------------
-st.markdown("---")
-st.subheader("🗺️ Ranking y Análisis Comparativo por Departamento")
-
-df_depto = df_filtrado.groupby('departamento')['cantidad'].sum().reset_index().sort_values(by='cantidad', ascending=False)
-total_general_filtrado = df_depto['cantidad'].sum()
-
-df_depto['Porcentaje (%)'] = ((df_depto['cantidad'] / total_general_filtrado) * 100).round(2)
-df_depto.rename(columns={'departamento': 'Departamento', 'cantidad': 'Casos Totales'}, inplace=True)
-
-col_dep1, col_dep2 = st.columns([3, 2])
-
-with col_dep1:
-    fig_rank = px.bar(
-        df_depto.head(15),
-        x='Departamento',
-        y='Casos Totales',
-        title="Top Departamentos con Mayor Incidencia",
-        labels={'Casos Totales': 'Número de Casos'},
-        hover_data={'Casos Totales': ':,', 'Porcentaje (%)': ':.2f'}
-    )
-    fig_rank.update_traces(marker_color="#2ca02c")
-    st.plotly_chart(fig_rank, use_container_width=True)
-
-with col_dep2:
-    st.write("**Tabla Detallada de Participación (%)**")
-    st.dataframe(
-        df_depto.style.format({'Casos Totales': '{:,}', 'Porcentaje (%)': '{:.2f}%'}),
-        use_container_width=True,
-        height=380
-    )
-
-# -----------------------------------------------------------------------------
-# HU5: MÓDULO DE PREDICCIÓN CON MACHINE LEARNING
-# -----------------------------------------------------------------------------
-st.markdown("---")
-st.subheader("🤖 Módulo Predictivo de Riesgo Futuro")
-
-st.warning("⚠️ Estimación basada en datos históricos, no es una certeza.")
-
-df_pred, tipo_riesgo, mae_error, anio_futuro = entrenar_y_predecir_siguiente_anio(df_filtrado)
-
-if df_pred is not None and not df_pred.empty:
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Año Proyectado", f"{anio_futuro}")
-    m2.metric("Tipología con Mayor Riesgo Estimado", f"{tipo_riesgo}")
-    m3.metric("Error Absoluto Medio (MAE del Modelo)", f"{mae_error:.2f} casos")
-
-    st.write(f"**Proyección de Casos por Tipología Penal para el Año {anio_futuro}:**")
-    
-    fig_pred = px.bar(
-        df_pred,
-        x='casos_estimados_siguiente_anio',
-        y='tipologia',
-        orientation='h',
-        title=f"Estimación de Frecuencia de Ciberataques ({anio_futuro})",
-        labels={'casos_estimados_siguiente_anio': 'Casos Estimados', 'tipologia': 'Tipología Penal'},
-        hover_data={'casos_estimados_siguiente_anio': ':,'}
-    )
-    fig_pred.update_traces(marker_color="#d62728")
-    st.plotly_chart(fig_pred, use_container_width=True)
-else:
-    st.info("Para generar estimaciones predictivas, seleccione un rango de filtros que contenga al menos 2 años con registros.")
+main()

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "CiberdelitosBI_Oscuro"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a22032d6-2124-47b4-ad8d-f1ee276792d3"
+  }
+}

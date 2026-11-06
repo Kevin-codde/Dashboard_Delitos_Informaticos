@@ -1,0 +1,80 @@
+table dim_fecha
+	lineageTag: db5ebefa-084d-5b58-ae57-3118a3198f99
+	dataCategory: Time
+
+	column fecha
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: d582b191-9b16-5d4d-baf8-a99fc9251cff
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		formatString: 0
+		lineageTag: a2c9c90c-738e-5bc2-96d2-76b4cd34e27e
+		summarizeBy: none
+		sourceColumn: anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes_num
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1c3de3d4-e8a1-5b0a-9f52-074762b5f6a6
+		summarizeBy: none
+		sourceColumn: mes_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: string
+		lineageTag: 916a7bfa-01eb-5753-8452-08808f82d03f
+		summarizeBy: none
+		sourceColumn: mes
+		sortByColumn: mes_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: string
+		lineageTag: 62099ace-90e7-50f4-a1c4-7a5da9c56733
+		summarizeBy: none
+		sourceColumn: trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column anio_mes
+		dataType: string
+		lineageTag: b2cb8337-7d5b-5f96-84dc-2c52fdc139b0
+		summarizeBy: none
+		sourceColumn: anio_mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes_corto = LEFT(dim_fecha[mes], 3)
+		dataType: string
+		lineageTag: c02e8399-46e7-5f46-8ac6-d6fed1ecc395
+		summarizeBy: none
+		sortByColumn: mes_num
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_fecha = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "dim_fecha", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"fecha", type date}, {"anio", Int64.Type}, {"mes_num", Int64.Type}, {"mes", type text}, {"trimestre", type text}, {"anio_mes", type text}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+

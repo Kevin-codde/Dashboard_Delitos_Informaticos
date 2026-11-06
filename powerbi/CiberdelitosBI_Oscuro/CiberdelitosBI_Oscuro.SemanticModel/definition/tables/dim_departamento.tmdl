@@ -1,0 +1,39 @@
+table dim_departamento
+	lineageTag: f86af65e-5828-5b17-af9e-f0223bd7c702
+
+	column departamento
+		dataType: string
+		lineageTag: 16661dba-d331-5244-a641-e791d8114710
+		summarizeBy: none
+		sourceColumn: departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column pais = "Colombia"
+		dataType: string
+		lineageTag: a17ea5d6-56b2-5817-a843-2f25dbcb4b56
+		dataCategory: Country
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_mapa = SWITCH(dim_departamento[departamento], "ATLANTICO", "Atlántico", "BOGOTA D.C.", "Bogotá", "BOLIVAR", "Bolívar", "BOYACA", "Boyacá", "CAQUETA", "Caquetá", "CHOCO", "Chocó", "CORDOBA", "Córdoba", "GUAINIA", "Guainía", "NARINO", "Nariño", "QUINDIO", "Quindío", "SAN ANDRES ISLAS", "San Andrés y Providencia", "VAUPES", "Vaupés", "VALLE DEL CAUCA", "Valle del Cauca", "NORTE DE SANTANDER", "Norte de Santander", "LA GUAJIRA", "La Guajira", UPPER(LEFT(dim_departamento[departamento], 1)) & LOWER(MID(dim_departamento[departamento], 2, LEN(dim_departamento[departamento]))))
+		dataType: string
+		lineageTag: d2a933bc-6407-5d44-9acb-830df826340f
+		dataCategory: StateOrProvince
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_departamento = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "dim_departamento", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"departamento", type text}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+
