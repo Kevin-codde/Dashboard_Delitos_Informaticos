@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "8f242ea06ed158478026",
+  "position": {
+    "x": 856,
+    "y": 160,
+    "z": 5,
+    "height": 88,
+    "width": 408,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_prediccion"
+                    }
+                  },
+                  "Property": "Error Medio (MAE)"
+                }
+              },
+              "queryRef": "fact_prediccion.Error Medio (MAE)",
+              "nativeQueryRef": "Error Medio (MAE)",
+              "displayName": "Error medio del modelo (casos)"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

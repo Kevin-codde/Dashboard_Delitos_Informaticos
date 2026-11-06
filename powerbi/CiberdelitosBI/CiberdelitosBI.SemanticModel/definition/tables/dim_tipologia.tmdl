@@ -1,0 +1,32 @@
+table dim_tipologia
+	lineageTag: ea8a0f1c-1846-53b5-b262-5d21ae020d0e
+
+	column codigo_tipologia
+		dataType: string
+		isHidden
+		lineageTag: 0364fc70-c92c-5a51-a6af-33c52abf5286
+		summarizeBy: none
+		sourceColumn: codigo_tipologia
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipologia
+		dataType: string
+		lineageTag: ac944ee2-9961-5bcf-a2d0-6430be3d4afc
+		summarizeBy: none
+		sourceColumn: tipologia
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_tipologia = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "dim_tipologia", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"codigo_tipologia", type text}, {"tipologia", type text}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+

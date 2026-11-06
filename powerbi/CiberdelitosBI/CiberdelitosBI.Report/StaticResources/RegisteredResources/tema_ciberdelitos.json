@@ -1,0 +1,138 @@
+{
+  "name": "Ciberdelitos",
+  "dataColors": [
+    "#1B6EF3",
+    "#E4572E",
+    "#13A89E",
+    "#F2A541",
+    "#7A5AF8",
+    "#0B2545",
+    "#5B6B8C",
+    "#9AA5B8"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#0B2545",
+  "tableAccent": "#1B6EF3",
+  "good": "#13A89E",
+  "neutral": "#F2A541",
+  "bad": "#E4572E",
+  "maximum": "#1B6EF3",
+  "center": "#F2A541",
+  "minimum": "#DCE8FD",
+  "textClasses": {
+    "label": {
+      "fontSize": 11,
+      "fontFace": "Segoe UI",
+      "color": "#5B6B8C"
+    },
+    "callout": {
+      "fontSize": 26,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0B2545"
+    },
+    "title": {
+      "fontSize": 13,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0B2545"
+    },
+    "header": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0B2545"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "fontColor": {
+              "solid": {
+                "color": "#0B2545"
+              }
+            },
+            "fontSize": 13,
+            "fontFamily": "Segoe UI Semibold",
+            "alignment": "left"
+          }
+        ],
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#E3E8EF"
+              }
+            },
+            "radius": 10
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": false
+          }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "labels": [
+          {
+            "color": {
+              "solid": {
+                "color": "#0B2545"
+              }
+            },
+            "fontSize": 26,
+            "fontFamily": "Segoe UI Semibold"
+          }
+        ],
+        "categoryLabels": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#5B6B8C"
+              }
+            },
+            "fontSize": 11
+          }
+        ]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "fontColor": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "backColor": {
+              "solid": {
+                "color": "#0B2545"
+              }
+            },
+            "fontSize": 11
+          }
+        ],
+        "values": [
+          {
+            "fontSize": 11
+          }
+        ]
+      }
+    }
+  }
+}

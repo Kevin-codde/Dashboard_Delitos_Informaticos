@@ -1,0 +1,123 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "8c8e893ba7415831be72",
+  "position": {
+    "x": 860,
+    "y": 164,
+    "z": 6,
+    "height": 540,
+    "width": 404,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_departamento"
+                    }
+                  },
+                  "Property": "departamento"
+                }
+              },
+              "queryRef": "dim_departamento.departamento",
+              "nativeQueryRef": "departamento"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "Total Casos"
+                }
+              },
+              "queryRef": "fact_incidentes.Total Casos",
+              "nativeQueryRef": "Total Casos",
+              "displayName": "Casos"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "% del Total"
+                }
+              },
+              "queryRef": "fact_incidentes.% del Total",
+              "nativeQueryRef": "% del Total",
+              "displayName": "% del total"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "Variación %"
+                }
+              },
+              "queryRef": "fact_incidentes.Variación %",
+              "nativeQueryRef": "Variación %",
+              "displayName": "Variación"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_incidentes"
+                  }
+                },
+                "Property": "Total Casos"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detalle por departamento'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

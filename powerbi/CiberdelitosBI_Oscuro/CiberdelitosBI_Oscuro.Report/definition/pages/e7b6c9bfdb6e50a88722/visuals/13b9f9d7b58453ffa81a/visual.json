@@ -1,0 +1,54 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "13b9f9d7b58453ffa81a",
+  "position": {
+    "x": 646,
+    "y": 160,
+    "z": 7,
+    "height": 88,
+    "width": 303,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "Departamento Principal"
+                }
+              },
+              "queryRef": "fact_incidentes.Departamento Principal",
+              "nativeQueryRef": "Departamento Principal",
+              "displayName": "Departamento con más casos"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "20D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

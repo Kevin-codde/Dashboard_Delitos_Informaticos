@@ -1,0 +1,54 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "bbc9f9fb68aa51e285d9",
+  "position": {
+    "x": 961,
+    "y": 160,
+    "z": 8,
+    "height": 88,
+    "width": 303,
+    "tabOrder": 8
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "Tipología Principal"
+                }
+              },
+              "queryRef": "fact_incidentes.Tipología Principal",
+              "nativeQueryRef": "Tipología Principal",
+              "displayName": "Tipología con más casos"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "20D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
