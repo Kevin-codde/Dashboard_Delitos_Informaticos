@@ -10,7 +10,7 @@ import time
 import pandas as pd
 import re
 from unidecode import unidecode
-from backend.Bd.db import cargar_datos_nosql
+from backend.db import cargar_datos_nosql
 
 NOMBRE_ARCHIVO = "delitos_informaticos.csv"
 
