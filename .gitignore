@@ -44,3 +44,6 @@ desktop.ini
 # Power BI (archivos temporales)
 *.pbix.tmp
 .pbi/
+
+# Power BI: Excel generado por powerbi/exportar_para_powerbi.py (se regenera)
+powerbi/salida/

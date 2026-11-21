@@ -103,3 +103,24 @@ series históricas.
 
 Antes de presentar los resultados, verifica que la fecha de corte y
 los registros cargados correspondan a la versión del CSV utilizado.
+
+## Power BI (reporte y datos)
+
+El reporte interactivo está en `powerbi/` (proyectos `CiberdelitosBI` y `CiberdelitosBI_Oscuro`)
+y el frontend de Streamlit solo lo muestra. Orden para actualizarlo, desde la raíz del repo,
+con el entorno virtual activo y MongoDB encendido:
+
+1. Cargar los datos en MongoDB con el ETL.
+2. Generar el Excel que lee Power BI:
+   ```powershell
+   pip install xlsxwriter
+   python powerbi/exportar_para_powerbi.py
+   ```
+   Crea `powerbi/salida/ciberdelitos_powerbi.xlsx` (no se sube al repo, se regenera) y escribe
+   la ruta de ese archivo, en tu computador, en el parámetro `RutaExcel` de los dos proyectos.
+3. Abrir `powerbi/CiberdelitosBI/CiberdelitosBI.pbip` en Power BI Desktop y pulsar Inicio → Actualizar.
+
+**Sobre `RutaExcel`:** en el repositorio es un valor neutro (`C:\RUTA\AL\REPO\...`). Para que git no
+suba la ruta personal de cada quien, ejecuta una sola vez en tu computador el comando
+`git update-index --skip-worktree ...` que imprime el exportador al terminar. Si prefieres
+cambiarla a mano: Power BI Desktop → Transformar datos → Administrar parámetros → `RutaExcel`.

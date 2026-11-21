@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "45e0a7e4c59a5ae29703",
+  "position": {
+    "x": 331,
+    "y": 84,
+    "z": 2,
+    "height": 92,
+    "width": 303,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_incidentes"
+                    }
+                  },
+                  "Property": "Municipios con Casos"
+                }
+              },
+              "queryRef": "fact_incidentes.Municipios con Casos",
+              "nativeQueryRef": "Municipios con Casos",
+              "displayName": "Municipios con casos"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

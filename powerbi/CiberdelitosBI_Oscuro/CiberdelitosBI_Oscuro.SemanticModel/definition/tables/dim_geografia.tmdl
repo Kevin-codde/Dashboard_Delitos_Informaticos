@@ -1,0 +1,41 @@
+table dim_geografia
+	lineageTag: ed00f972-d6db-5aeb-8850-4ec65b9f2c72
+
+	column id_geografia
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d6b479f6-e371-5629-a359-5b4efbf6b89e
+		summarizeBy: none
+		sourceColumn: id_geografia
+
+		annotation SummarizationSetBy = Automatic
+
+	column departamento
+		dataType: string
+		lineageTag: 0215af7f-7a35-59ca-a5c7-ca04ebf03a1b
+		summarizeBy: none
+		sourceColumn: departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column municipio
+		dataType: string
+		lineageTag: b6c4e8af-3573-555b-b783-ab9d6b0aced7
+		summarizeBy: none
+		sourceColumn: municipio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_geografia = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "dim_geografia", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"id_geografia", Int64.Type}, {"departamento", type text}, {"municipio", type text}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+

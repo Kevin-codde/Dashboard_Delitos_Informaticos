@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "f9c272a4bd6c52b6815f",
+  "position": {
+    "x": 16,
+    "y": 160,
+    "z": 3,
+    "height": 88,
+    "width": 408,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_prediccion"
+                    }
+                  },
+                  "Property": "Año Proyectado"
+                }
+              },
+              "queryRef": "fact_prediccion.Año Proyectado",
+              "nativeQueryRef": "Año Proyectado",
+              "displayName": "Año proyectado"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

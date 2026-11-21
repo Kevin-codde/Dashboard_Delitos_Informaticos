@@ -1,0 +1,54 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "161d9fedd90b5462a761",
+  "position": {
+    "x": 436,
+    "y": 160,
+    "z": 4,
+    "height": 88,
+    "width": 408,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_prediccion"
+                    }
+                  },
+                  "Property": "Tipología de Mayor Riesgo"
+                }
+              },
+              "queryRef": "fact_prediccion.Tipología de Mayor Riesgo",
+              "nativeQueryRef": "Tipología de Mayor Riesgo",
+              "displayName": "Tipología de mayor riesgo estimado"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "labels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "20D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

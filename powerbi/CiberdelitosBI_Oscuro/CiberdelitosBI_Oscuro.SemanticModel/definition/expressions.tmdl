@@ -1,0 +1,5 @@
+expression RutaExcel = "C:\RUTA\AL\REPO\powerbi\salida\ciberdelitos_powerbi.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b442769b-9b1e-5eab-9fd9-954baaba259e
+
+	annotation PBI_ResultType = Text
+
