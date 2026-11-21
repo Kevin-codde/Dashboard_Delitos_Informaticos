@@ -7,3 +7,10 @@ pymongo>=4.9
 tinydb>=4.8
 scikit-learn>=1.5
 python-dateutil>=2.9
+fastapi
+uvicorn
+pymongo
+bcrypt
+PyJWT
+pydantic[email]
+requests
