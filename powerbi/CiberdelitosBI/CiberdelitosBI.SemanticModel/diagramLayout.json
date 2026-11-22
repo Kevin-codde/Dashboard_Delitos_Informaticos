@@ -1,0 +1,100 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 284.69555106822361,
+            "y": 77.821068737274231
+          },
+          "nodeIndex": "fact_prediccion",
+          "nodeLineageTag": "d8f3be55-ae35-5966-80c8-70d490469983",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 432.60208499567671
+          },
+          "nodeIndex": "dim_departamento",
+          "nodeLineageTag": "f86af65e-5828-5b17-af9e-f0223bd7c702",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 571.327737279634,
+            "y": 213.76773697357993
+          },
+          "nodeIndex": "dim_fecha",
+          "nodeLineageTag": "db5ebefa-084d-5b58-ae57-3118a3198f99",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 825.32557620919977,
+            "y": 501.67419208290607
+          },
+          "nodeIndex": "dim_geografia",
+          "nodeLineageTag": "ed00f972-d6db-5aeb-8850-4ec65b9f2c72",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 822.45808401045338,
+            "y": -50
+          },
+          "nodeIndex": "dim_tipologia",
+          "nodeLineageTag": "ea8a0f1c-1846-53b5-b262-5d21ae020d0e",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1123.1400958660606,
+            "y": 159.76630153793562
+          },
+          "nodeIndex": "fact_incidentes",
+          "nodeLineageTag": "a310f59b-11b4-5530-aaa4-390777f08513",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}

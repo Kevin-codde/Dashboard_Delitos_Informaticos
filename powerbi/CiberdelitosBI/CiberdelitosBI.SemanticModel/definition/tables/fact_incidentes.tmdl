@@ -1,0 +1,106 @@
+table fact_incidentes
+	lineageTag: a310f59b-11b4-5530-aaa4-390777f08513
+
+	measure 'Total Casos' = SUM(fact_incidentes[cantidad])
+		formatString: #,0
+		displayFolder: Medidas
+		lineageTag: 7d6693b1-1747-5d51-a1e2-2ea94af19060
+
+	measure 'Casos Último Año' = VAR _fmax = MAX(dim_fecha[fecha]) VAR _anio = YEAR(_fmax) RETURN CALCULATE([Total Casos], DATESBETWEEN(dim_fecha[fecha], DATE(_anio, 1, 1), _fmax))
+		formatString: #,0
+		displayFolder: Medidas
+		lineageTag: 08af93cc-9f43-532d-a6e8-34861c0ee9dd
+
+	measure 'Casos Periodo Anterior' = VAR _fmax = MAX(dim_fecha[fecha]) VAR _anio = YEAR(_fmax) RETURN CALCULATE([Total Casos], REMOVEFILTERS(dim_fecha[anio]), DATESBETWEEN(dim_fecha[fecha], DATE(_anio - 1, 1, 1), EDATE(_fmax, -12)))
+		formatString: #,0
+		displayFolder: Medidas
+		lineageTag: d2382b70-0e5f-577f-aa68-7400c8848aa1
+
+	measure 'Variación %' = DIVIDE([Casos Último Año] - [Casos Periodo Anterior], [Casos Periodo Anterior])
+		formatString: 0.0%
+		displayFolder: Medidas
+		lineageTag: e480ceda-4d51-5d55-b7c6-46a186200adb
+
+	measure '% del Total' = DIVIDE([Total Casos], CALCULATE([Total Casos], REMOVEFILTERS(dim_departamento)))
+		formatString: 0.0%
+		displayFolder: Medidas
+		lineageTag: 5c164d35-998e-5bde-920f-a5e2b2916d63
+
+	measure 'Departamento Principal' = VAR _t = TOPN(1, VALUES(dim_departamento[departamento]), [Total Casos], DESC) RETURN CONCATENATEX(_t, dim_departamento[departamento], ", ")
+		displayFolder: Medidas
+		lineageTag: 624bcfb0-7059-5515-873f-4f4a981c0b45
+
+	measure 'Tipología Principal' = VAR _t = TOPN(1, VALUES(dim_tipologia[tipologia]), [Total Casos], DESC) RETURN CONCATENATEX(_t, dim_tipologia[tipologia], ", ")
+		displayFolder: Medidas
+		lineageTag: d1e5050a-7e0a-5c4f-91bb-cdb9132f766b
+
+	measure 'Municipios con Casos' = DISTINCTCOUNT(fact_incidentes[id_geografia])
+		formatString: #,0
+		displayFolder: Estado de los datos
+		lineageTag: 78a46ee8-9e12-5559-b8fa-b0983115b27e
+
+	measure Registros = COUNTROWS(fact_incidentes)
+		formatString: #,0
+		displayFolder: Estado de los datos
+		lineageTag: 95b10669-4200-5b1d-b471-70681965f46b
+
+	measure 'Primer Año' = MIN(dim_fecha[anio])
+		formatString: 0
+		displayFolder: Estado de los datos
+		lineageTag: 31403d36-fa9d-5d67-90ba-6f2f86019d02
+
+	measure 'Fecha de Corte' = CALCULATE(MAX(dim_fecha[fecha]), ALL(dim_fecha))
+		formatString: dd/mm/yyyy
+		displayFolder: Estado de los datos
+		lineageTag: 5e742ca2-3546-57b8-8d5d-95dc77ef21ac
+
+	column fecha
+		dataType: dateTime
+		isHidden
+		formatString: dd/mm/yyyy
+		lineageTag: f84ccf99-501c-5085-94dc-3826dddc60eb
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_geografia
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2c55205f-adcb-592f-9c52-e4b668c4f274
+		summarizeBy: none
+		sourceColumn: id_geografia
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_tipologia
+		dataType: string
+		isHidden
+		lineageTag: 3e68f677-ff8c-56b5-ad62-f975b07fdd13
+		summarizeBy: none
+		sourceColumn: codigo_tipologia
+
+		annotation SummarizationSetBy = Automatic
+
+	column cantidad
+		dataType: int64
+		formatString: #,0
+		lineageTag: f9428dfe-3a96-5655-b4a5-afc69913fdc9
+		summarizeBy: sum
+		sourceColumn: cantidad
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_incidentes = m
+		mode: import
+		source =
+				let
+					Origen = Excel.Workbook(File.Contents(RutaExcel), true, true),
+					Hoja = Origen{[Item = "fact_incidentes", Kind = "Sheet"]}[Data],
+					Tipos = Table.TransformColumnTypes(Hoja, {{"fecha", type date}, {"id_geografia", Int64.Type}, {"codigo_tipologia", type text}, {"cantidad", Int64.Type}})
+				in
+					Tipos
+
+	annotation PBI_ResultType = Table
+

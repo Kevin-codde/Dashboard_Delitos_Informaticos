@@ -1,0 +1,24 @@
+relationship 1084c1f0-8244-53e1-a632-0ce920a2c4a6
+	fromColumn: fact_incidentes.fecha
+	toColumn: dim_fecha.fecha
+
+relationship 8f0b73a0-c517-5dbb-aa71-e6abe7bed12f
+	fromColumn: fact_incidentes.id_geografia
+	toColumn: dim_geografia.id_geografia
+
+relationship 962bbdf1-0c0b-5f86-ac59-c6068ace0c2d
+	fromColumn: dim_geografia.departamento
+	toColumn: dim_departamento.departamento
+
+relationship d6233ec6-badb-50da-aa25-9141e68e0a4b
+	fromColumn: fact_incidentes.codigo_tipologia
+	toColumn: dim_tipologia.codigo_tipologia
+
+relationship 6273c3ee-304f-5ff1-a7d5-29454da4feff
+	fromColumn: fact_prediccion.codigo_tipologia
+	toColumn: dim_tipologia.codigo_tipologia
+
+relationship 85024000-267d-568e-9a01-26eeef7f8f70
+	fromColumn: fact_prediccion.departamento
+	toColumn: dim_departamento.departamento
+

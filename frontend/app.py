@@ -51,6 +51,45 @@ def cargar_datos_cache(anio_range, meses, departamento, municipio, tipologias):
         tipologias=tipologias,
     )
 
+from config import REPORTE_CLARO, REPORTE_OSCURO  # enlaces públicos: ver frontend/config.py
+
+# El reporte mide 1280x720; se suman ~42 px de la barra inferior de Power BI (proporción 1280 / 762).
+
+
+def obtener_url(oscuro: bool = False) -> str:
+    """URL del reporte: variable de entorno, luego secrets.toml, luego frontend/config.py.
+    En modo oscuro usa POWERBI_URL_OSCURO; si no está definida, cae al reporte claro."""
+    clave = "POWERBI_URL_OSCURO" if oscuro else "POWERBI_URL"
+    por_defecto = REPORTE_OSCURO if oscuro else REPORTE_CLARO
+    if clave in os.environ:
+        return os.environ[clave].strip()
+    try:
+        url = str(st.secrets.get(clave, "")).strip()
+        if url:
+            return url
+    except Exception:  # no existe secrets.toml
+        pass
+    return por_defecto
+
+
+def url_valida(url: str) -> bool:
+    return url.startswith("https://app.powerbi.com/")
+
+
+CSS_OSCURO = """
+<style>
+  .stApp, [data-testid="stAppViewContainer"] {background: #0A1222; color: #E8EEF9;}
+  header[data-testid="stHeader"] {background: transparent;}
+  .titulo {color: #E8EEF9 !important;}
+  .sub, .stCaption, [data-testid="stCaptionContainer"] {color: #9FB0CC !important;}
+  .pbi {border: 1px solid #243350 !important;}
+  [data-testid="stBaseLinkButton-secondary"] {background: #121C31 !important; color: #E8EEF9 !important;
+                                              border: 1px solid #243350 !important;}
+  [data-testid="stBaseLinkButton-secondary"] p {color: #E8EEF9 !important;}
+  [data-testid="stBaseButton-secondary"] {background: #121C31; color: #E8EEF9; border-color: #243350;}
+  label, p {color: #E8EEF9;}
+</style>
+"""
 
 # =============================================================================
 # 0. PUERTA DE ACCESO (CU1: Iniciar sesión)
