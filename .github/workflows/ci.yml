@@ -1,0 +1,88 @@
+name: CI - Pruebas y calidad
+
+# Se ejecuta en cada push y en cada pull request hacia main (TC-19 y TC-20)
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write   # para comentar la puntuación en el pull request
+
+jobs:
+  pruebas:
+    name: Pruebas backend, frontend e integración
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # MongoDB 7.0 real, separado de la base de datos del proyecto
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      MONGO_URI: mongodb://localhost:27017
+      DB_NAME: bi_delitos_test
+      SECRET_KEY: clave-solo-para-pruebas-ci
+      EXIGIR_MONGO_REAL: "1"      # en CI nunca se usa la simulación
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      # Si alguna prueba falla, este paso queda en rojo y bloquea el pull request
+      - name: Ejecutar pruebas
+        run: pytest
+
+      # Corre aunque las pruebas fallen, para ver la puntuación y los defectos
+      - name: Generar reporte con puntuación
+        if: always()
+        run: python scripts/reporte_ci.py
+
+      - name: Guardar evidencias (resultados, cobertura y matriz)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-pruebas
+          path: |
+            reports/resumen.md
+            reports/resultados.json
+            reports/coverage.json
+            reports/matriz_resultados.csv
+
+      - name: Comentar la puntuación en el pull request
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true     # los PR desde forks no tienen permiso de comentar
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marca = '<!-- reporte-ci-pruebas -->';
+            const cuerpo = marca + '\n' + fs.readFileSync('reports/resumen.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const numero = context.issue.number;
+            const comentarios = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: numero });
+            const previo = comentarios.find(c => c.body && c.body.includes(marca));
+            if (previo) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: previo.id, body: cuerpo });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: numero, body: cuerpo });
+            }

@@ -14,3 +14,6 @@ bcrypt
 PyJWT
 pydantic[email]
 requests
+httpx
+pytest
+pytest-cov
