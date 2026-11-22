@@ -1,0 +1,17 @@
+# Dependencias para ejecutar las pruebas (local y en GitHub Actions)
+# --- backend ---
+fastapi
+uvicorn
+pymongo
+bcrypt
+PyJWT
+pydantic[email]
+httpx
+# --- frontend ---
+streamlit
+plotly
+pandas
+requests
+# --- pruebas ---
+pytest
+pytest-cov

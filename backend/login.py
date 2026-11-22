@@ -27,6 +27,8 @@ from pydantic import BaseModel, EmailStr, Field
 from pymongo import ASCENDING, MongoClient, ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
+import servicios
+
 # ----------------------------------------------------------------------------
 # Configuración
 # ----------------------------------------------------------------------------
@@ -250,17 +252,19 @@ def a_salida(u: dict) -> UsuarioSalida:
 def _validar_rol(rol: str) -> None:
     if rol not in ROLES:
         raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, f"Rol inválido. Opciones: {', '.join(ROLES)}"
+            422, f"Rol inválido. Opciones: {', '.join(ROLES)}"
         )
 
 
 # ----------------------------------------------------------------------------
 # Dependencias de autenticación / autorización
 # ----------------------------------------------------------------------------
-bearer = HTTPBearer()
+bearer = HTTPBearer(auto_error=False)  # sin token respondemos 401 (no 403)
 
 
-def usuario_actual(credenciales: HTTPAuthorizationCredentials = Depends(bearer)) -> dict:
+def usuario_actual(
+    credenciales: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
+) -> dict:
     """Valida el token y recarga el usuario desde la BD (así un cambio de rol o
     una desactivación se aplican de inmediato)."""
     no_autorizado = HTTPException(
@@ -268,6 +272,8 @@ def usuario_actual(credenciales: HTTPAuthorizationCredentials = Depends(bearer))
         "Token inválido o expirado",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    if credenciales is None:
+        raise no_autorizado
     try:
         payload = jwt.decode(credenciales.credentials, SECRET_KEY, algorithms=[ALGORITHM])
         usuario = repo.por_id(payload["sub"])
@@ -397,3 +403,21 @@ def eliminar_usuario(usuario_id: str, admin: dict = Depends(requiere_permiso("ge
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No puedes eliminar tu propia cuenta")
     if not repo.eliminar(usuario_id):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Usuario no encontrado")
+
+
+# --- CU3: Ejecutar pipeline ETL (solo Administrador) ------------------------
+@app.post("/etl/ejecutar", tags=["Pipeline"])
+def etl_ejecutar(_: dict = Depends(requiere_permiso("ejecutar_etl"))):
+    try:
+        return servicios.ejecutar_etl()
+    except Exception as error:  # noqa: BLE001
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, f"Falló el ETL: {error}")
+
+
+# --- CU6: Reentrenar modelo predictivo (solo Analista) ----------------------
+@app.post("/modelo/reentrenar", tags=["Pipeline"])
+def modelo_reentrenar(_: dict = Depends(requiere_permiso("entrenar_modelo"))):
+    try:
+        return servicios.reentrenar_modelo()
+    except Exception as error:  # noqa: BLE001
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, f"Falló el entrenamiento: {error}")

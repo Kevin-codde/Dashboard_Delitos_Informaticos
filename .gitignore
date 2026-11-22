@@ -45,5 +45,10 @@ desktop.ini
 *.pbix.tmp
 .pbi/
 
+<<<<<<< HEAD
+reports/
+.coverage
+=======
 # Power BI: Excel generado por powerbi/exportar_para_powerbi.py (se regenera)
 powerbi/salida/
+>>>>>>> a965a69c92139b8df40fa8c5dbbd7201eb322f7a
